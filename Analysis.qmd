@@ -1,0 +1,366 @@
+---
+title: "Analysis"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+# LGBQ Support & U.S. Christian Religious Leaders
+
+## Running syntax
+
+If you are unfamiliar with R please read below.
+
+To run this syntax file, you need to install the package {pacman} which will identify if you need to install any packages (and subsequently load them them).
+
+Otherwise, you should be able to "Run All" without having to make any changes to reproduce analyses.
+
+# Preparation
+
+Please run the code below if you do not have the package {pacman} installed.
+
+## Load "pacman"
+
+```{r}
+# install.packages("pacman")
+pacman::p_load(haven, tidyverse, psych, apaTables, gtsummary, gt, rempsyc, flextable, jtools, interactions)
+```
+
+## Load data
+
+```{r}
+org_data <- read_sav("Data.sav")
+data <- org_data
+```
+
+## Lowercase all variable names
+
+```{r}
+names(data) <- tolower(names(data))
+```
+
+## SessionInfo
+
+sessionInfo() R version 4.4.0 (2024-04-24) Platform: aarch64-apple-darwin20 Running under: macOS Sonoma 14.5
+
+Matrix products: default BLAS: /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib; LAPACK version 3.12.0
+
+locale: \[1\] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Los_Angeles tzcode source: internal
+
+attached base packages: \[1\] stats graphics grDevices utils datasets methods base
+
+other attached packages: \[1\] interactions_1.1.5 jtools_2.2.2 flextable_0.9.6 rempsyc_0.1.7 gt_0.10.1\
+\[6\] gtsummary_1.7.2 apaTables_3.0.0 psych_2.4.3 lubridate_1.9.3 forcats_1.0.0\
+\[11\] stringr_1.5.1 dplyr_1.1.4 purrr_1.0.2 readr_2.1.5 tidyr_1.3.1\
+\[16\] tibble_3.2.1 ggplot2_3.5.1 tidyverse_2.0.0 haven_2.5.4
+
+loaded via a namespace (and not attached): \[1\] tidyselect_1.2.1 fastmap_1.2.0 fontquiver_0.2.1 pacman_0.5.1\
+\[5\] bayestestR_0.13.2 promises_1.3.0 broom.helpers_1.15.0 digest_0.6.35\
+\[9\] estimability_1.5.1 timechange_0.3.0 mime_0.12 lifecycle_1.0.4\
+\[13\] gfonts_0.2.0 survival_3.5-8 magrittr_2.0.3 compiler_4.4.0\
+\[17\] rlang_1.1.4 tools_4.4.0 utf8_1.2.4 data.table_1.15.4\
+\[21\] knitr_1.47 askpass_1.2.0 mnormt_2.1.1 curl_5.2.1\
+\[25\] xml2_1.3.6 httpcode_0.3.0 withr_3.0.0 datawizard_0.10.0\
+\[29\] grid_4.4.0 fansi_1.0.6 gdtools_0.3.7 xtable_1.8-4\
+\[33\] colorspace_2.1-0 emmeans_1.10.2 scales_1.3.0 crul_1.4.2\
+\[37\] insight_0.19.11 mvtnorm_1.2-4 cli_3.6.2 survey_4.4-2\
+\[41\] rmarkdown_2.27 crayon_1.5.2 ragg_1.3.2 generics_0.1.3\
+\[45\] performance_0.11.0 rstudioapi_0.16.0 tzdb_0.4.0 parameters_0.21.6\
+\[49\] DBI_1.2.2 pander_0.6.5 splines_4.4.0 parallel_4.4.0\
+\[53\] effectsize_0.8.8 mitools_2.4 vctrs_0.6.5 Matrix_1.7-0\
+\[57\] jsonlite_1.8.8 fontBitstreamVera_0.1.1 hms_1.1.3 systemfonts_1.1.0\
+\[61\] glue_1.7.0 stringi_1.8.4 gtable_0.3.5 later_1.3.2\
+\[65\] munsell_0.5.1 pillar_1.9.0 htmltools_0.5.8.1 openssl_2.2.0\
+\[69\] R6_2.5.1 textshaping_0.4.0 evaluate_0.23 shiny_1.8.1.1\
+\[73\] lattice_0.22-6 papaja_0.1.2 backports_1.5.0 broom_1.0.6\
+\[77\] fontLiberation_0.1.0 httpuv_1.6.15 Rcpp_1.0.12 zip_2.3.1\
+\[81\] uuid_1.2-0 coda_0.19-4.1 nlme_3.1-164 officer_0.6.6\
+\[85\] xfun_0.44 tinylabels_0.2.4 pkgconfig_2.0.3
+
+# Demographic Table
+
+## Minor Edits
+
+For some reason it looks like value labels are missing in the datat for `hhincome` variable. Thankfully the codebook denotes a value to its corresponding label.
+
+| **Value** | **Label**           |
+|-----------|---------------------|
+| 1         | \$0-\$9,999         |
+| 2         | \$10,000-\$14,999   |
+| 3         | \$15,000-\$19,999   |
+| 4         | \$20,000-\$24,999   |
+| 5         | \$25,000-\$34,999   |
+| 6         | \$35,000-\$49,999   |
+| 7         | \$50,000-\$74,999   |
+| 8         | \$75,000-\$99,999   |
+| 9         | \$100,000-\$124,999 |
+| 10        | \$125,000-\$149,999 |
+| 11        | \$150,000-\$174,999 |
+| 12        | \$175,000-\$199,999 |
+| 13        | \$200,000 or more   |
+
+Let's add these value labels to the variable `hhincome`.
+
+```{r}
+data$hhincome <- labelled_spss(data$hhincome,
+                               labels = c(
+                                 "$0 - $9,999" = 1,
+                                 "$10,000 - $14,999" = 2,
+                                 "$15,000 - $19,999" = 3,
+                                 "$20,000 - $24,999" = 4,
+                                 "$25,000 - $34,999" = 5,
+                                 "$35,000 - $49,999" = 6,
+                                 "$50,000 - $74,999" = 7,
+                                 "$75,000 - $99,999" = 8,
+                                 "$100,000 - $124,999" = 9,
+                                 "$125,000 - $149,999" = 10,
+                                 "$150,000 - $174,999" = 11,
+                                 "$175,000 - $199,999" = 12,
+                                 "$200,000 or more" = 13
+                               ),
+                               label = "Total Income")
+```
+
+## Table
+
+```{r}
+# First we create a subset of data that we want a summary of.
+dem_data <- subset(data, select = c(yearborn, gender, race, educ, timeserv, hhincome))
+
+# We need to convert labelled data into factors. 
+dem_data <- dem_data %>%
+  mutate(across(c(yearborn, gender, race, educ, hhincome), ~ haven::as_factor(.)))
+
+# Create the summary table using the full data frame
+dem_table <- gtsummary::tbl_summary(
+  dem_data,
+  include = c(yearborn, gender, race, educ, timeserv, hhincome),
+  missing = "ifany",
+  statistic = list(
+    all_continuous() ~ "{mean} ({sd})",
+    all_categorical() ~ "{n} ({p}%)"
+  ),
+  digits = list(
+    all_continuous() ~ 2,
+    all_categorical() ~ c(0, 2)
+  ),
+  label = list(
+    yearborn ~ "Year Born",
+    gender ~ "Gender",
+    race ~ "Race/Ethnicity",
+    educ ~ "Educational Attainment",
+    timeserv ~ "Years in Ministry",
+    hhincome ~ "Income"
+  )
+)
+
+dem_table %>%
+  as_flex_table() %>%
+  flextable::save_as_docx(path = "dem_table.docx")
+
+dem_table <- dem_table %>%
+  as_flex_table()
+dem_table <- set_caption(dem_table, "Table 1: Demographic Table")
+dem_table <- font(dem_table, fontname = "Times New Roman", part = "all")
+
+dem_table
+```
+
+# Analysis
+
+## H1
+
+**Among US Christian religious leaders, what is the average level of LGBQ support?**
+
+### Mean/SD
+
+```{r}
+# Create compsite without standardization for descriptives
+data$lgbt_descript <- (data$gaymarry + data$orient) / 2
+weighted_mean <- weighted.mean(data$lgbt_descript, data$wt_nsrl_primary_dup, na.rm = TRUE)
+weighted_mean <- round(weighted_mean, digits = 2)
+weighted_sd <- sqrt(sum(data$wt_nsrl_primary_dup[!is.na(data$lgbt_descript)] * 
+                        (data$lgbt_descript[!is.na(data$lgbt_descript)] - weighted_mean)^2, na.rm = TRUE) / 
+                    sum(data$wt_nsrl_primary_dup[!is.na(data$lgbt_descript)], na.rm = TRUE))
+weighted_sd <- round(weighted_sd, digits = 2)
+
+print(paste("Weighted Mean:", weighted_mean))
+print(paste("Weighted Standard Deviation:", weighted_sd))
+
+hist(data$lgbt_descript, main = "Histogram of LGBQ Support")
+```
+
+### Range
+
+```{r}
+# Calculate weighted minimum and maximum
+weighted_min <- min(data$lgbt_descript[data$wt_nsrl_primary_dup > 0], na.rm = TRUE)
+weighted_max <- max(data$lgbt_descript[data$wt_nsrl_primary_dup > 0], na.rm = TRUE)
+
+# Calculate the range
+weighted_range <- weighted_max - weighted_min
+
+# Print results
+print(paste("Weighted Minimum:", weighted_min))
+print(paste("Weighted Maximum:", weighted_max))
+print(paste("Weighted Range:", weighted_range))
+```
+
+## Composite Variables
+
+Prior to running analyses, we will create composite variables assessing for good internal reliability
+
+### LGBQ Support
+
+```{r}
+# Standardize variables
+data$gaymarry1 <- scale(data$gaymarry)
+data$orient1 <- scale(data$orient)
+
+source("Spearman_Brown.R")
+spearman_brown(data, items = c("gaymarry1", "orient1"))
+```
+
+LGBQ Support demonstrates acceptable internal reliability.
+
+```{r}
+# Create composite variable
+data$lgbqsupport <- (data$gaymarry1 + data$orient1) / 2
+```
+
+### Race
+
+```{r}
+race_dummy <- dummy.code(data$race)
+data <- cbind(data, race_dummy)
+
+# Rename the new columns
+colnames(data)[(ncol(data) - 3):ncol(data)] <- c("white", "black", "hispanic", "asian")
+
+data$poc <- ifelse(data$race == 1, 0, 1)
+```
+
+### LITERAL
+
+```{r}
+# We need to reverse code Bible first
+data$bible <- 6 - data$bible
+
+# Standardize variables
+data$bible1 <- scale(data$bible)
+data$sixdays1 <- scale(data$sixdays)
+data$yngearth1 <- scale(data$yngearth)
+data$cremirac1 <- scale(data$cremirac)
+```
+
+```{r}
+literal_cor <- subset(data, select = c(bible1, sixdays1, yngearth1, cremirac1))
+
+alpha(literal_cor, check.keys = TRUE, na.rm = TRUE)
+```
+
+This composite variable demonstrates good internal reliability.
+
+```{r}
+# Create composite variable
+data$literal <- (data$bible1 + data$sixdays1 + data$yngearth1 + data$cremirac1) / 4
+```
+
+### Prayer
+
+```{r}
+# As a count variable this variable will not be standardized
+data$praysolo1 <- scale(data$praysolo)
+data$grace1 <- scale(data$grace)
+
+spearman_brown(data, items = c("praysolo1", "grace1"))
+```
+
+The items do not display acceptable internal reliability. As two items it is also inappropriate to perform a EFA. We will analyze prayer individually.
+
+### Cong_Race
+
+```{r}
+data$cong_racc <- ifelse(data$cong_race == 1, 0, 1)
+```
+
+### Gender
+
+Gender needs to be recoded, as the values are currently 1 and 2, when it should be 0 and 1.
+
+```{r}
+data$gender <- ifelse(data$gender == 1, 0, 1)
+```
+
+### H2
+
+**Psychosocial Correlates**
+
+```{r}
+cor_data <- subset(data, select = c(
+  lgbqsupport,
+  gender, white, black, hispanic, asian, yearborn, educ, # demographic
+  timeserv, hhincome,
+  doubt, # religiousness
+  god, literal, grace, praysolo, # spiritual
+  cong_size,
+  cong_race
+))
+cor_table <- apa.cor.table(data = cor_data, table.number = 1, show.conf.interval = FALSE, show.pvalue = TRUE)
+apa.save(filename = "cor_table.doc", cor_table)
+```
+
+## H3
+
+Religious doubt (measured by the *DOUBT* item) will be positively associated with LGBQ support (measured by the “LGBQSUPPORT” item)
+
+```{r}
+rq3 <- lm(lgbqsupport ~ doubt + gender + poc + educ + yearborn + hhincome, data = data, weights = wt_nsrl_primary_dup)
+
+rq3 %>%
+  summ(digits = 3)
+```
+
+Results show that even after controlling for demographic covariates, religious doubt remains a predictor of LGBQ support. Such that as religious doubt increases, LGBQ support also increases.
+
+## H4a-c
+
+```{r}
+rq4ac <- lm(lgbqsupport ~ literal + praysolo + grace + god + gender + poc + yearborn + educ, data = data, weights = wt_nsrl_primary_dup)
+
+rq4ac %>%
+  summ(digits = 3)
+```
+
+## H5a
+
+```{r}
+# Center IV and Moderator
+data$lgbqsupport <- scale(data$lgbqsupport)
+data$cong_size <- scale(data$cong_size)
+
+h5a <- lm(lgbqsupport ~ literal * cong_size + gender + black + white + hispanic + yearborn + educ, data = data, weights = wt_nsrl_primary_dup)
+
+h5a %>%
+  summ(digits = 3)
+```
+
+## H5b
+
+```{r}
+h5b <- lm(lgbqsupport ~ literal * cong_racc + gender + asian + black + hispanic + yearborn + educ, data = data, weights = wt_nsrl_primary_dup)
+
+h5b %>%
+  summ(digits = 3)
+
+nice_lm_slopes(h5b, predictor = "literal", moderator = "cong_racc", standardize = FALSE) %>%
+  nice_table()
+
+interact_plot(h5b, 
+              literal,
+              cong_racc,
+              data = data)
+```
