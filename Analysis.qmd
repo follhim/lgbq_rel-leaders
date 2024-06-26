@@ -342,7 +342,7 @@ rq4ac %>%
 data$lgbqsupport <- scale(data$lgbqsupport)
 data$cong_size <- scale(data$cong_size)
 
-h5a <- lm(lgbqsupport ~ literal * cong_size + gender + black + white + hispanic + yearborn + educ, data = data, weights = wt_nsrl_primary_dup)
+h5a <- lm(lgbqsupport ~ literal * cong_size + gender + black + hispanic + yearborn + educ, data = data, weights = wt_nsrl_primary_dup)
 
 h5a %>%
   summ(digits = 3)
